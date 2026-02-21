@@ -1,0 +1,484 @@
+
+go atlas
+
+set lt=1e-7 
+
+mesh width = 300
+
+####### X-MESHING ########
+x.mesh loc=0 spac=1
+x.mesh loc=0.5 spac=0.5
+x.mesh loc=1.5 spac=0.25
+x.mesh loc=2.5 spac=0.25
+x.mesh loc=4.5 spac=0.5
+x.mesh loc=5 spac=1
+
+####### Y-MESHING #######
+y.mesh loc=-0.08 spac=0.1
+y.mesh loc=-0.07 spac=0.1
+y.mesh loc=-0.069 spac=0.01
+y.mesh loc=-0.04 spac=0.1
+y.mesh loc=-0.02 spac=0.001
+y.mesh loc=0 spac=0.0001
+y.mesh loc=0.018 spac=0.001
+y.mesh loc=0.02 spac=0.0001
+y.mesh loc=0.03 spac=0.0001
+y.mesh loc=1.0 spac=0.5
+y.mesh loc=2.02 spac=0.1
+#y.mesh loc=2.05 spac=0.5
+y.mesh loc=3.02 spac=1 
+
+############### REGION ################# 
+region number=1 x.min=0 y.min=-0.08 material=Si3N4
+#region number=1 x.min=0 y.min=-0.081 material=Si3N4
+region number=2 x.min=0 x.max=5 y.min=0 y.max=0.018 material=AlGaN x.comp=0.23 
+region number=3 x.min=0 x.max=5 y.min=0.018 y.max=0.02 material=AlN
+region number=4 x.min=0 x.max=5 y.min=0.02 y.max=2.02 material=GaN 
+region number=5 x.min=1.5 x.max=2.5 y.min=-0.08 y.max=-0.07 user.material=GA
+region number=6 x.min=0 x.max=5 y.min=2.02 y.max=3.02 material=Sapphire  
+region number=7 x.min=1.5 x.max=2.5 y.min=-0.07 y.max=-0.069 user.material=Dipole_Layer
+
+############# ELECTRODE ########### 
+electrode name=source number=1 x.min=0 x.max=0.5 y.min=-0.08 y.max=0.03
+electrode name=drain number=2 x.min=4.5 x.max=5 y.min=-0.08 y.max=0.03
+electrode name=gate number=3 x.min=1.5 x.max=2.5 y.min=-0.069 y.max=0
+#electrode name=substrate number=4 y.min=3.02 y.max=3.02
+
+############# CONTACT ############
+
+contact name=source workfunction=4
+contact name=drain workfunction=4
+contact name=gate workfunction=5.22
+contact name=substrate number=4
+
+############# MODEL ###############
+models fldmob conmob print srh
+mobility albrct.n 
+#models polarization calc.strain polar.scale=0.75
+models polarization calc.strain polar.scale=1.0
+models TEN.PIEZO CALC.STRAIN TENSOR.SCALE=0 PSP.SCALE=0.75 PIEZO.SCALE=0.75
+output con.band val.band charge polar.charge band.par qss e.lines e.velocity e.mobility
+
+############# IMPACT IONIZATION PARAMETERS #############
+material material=Dipole_Layer user.default=oxide user.group=Insulator permittivity=2.25 
+material material=GA user.default=oxide user.group=Insulator permittivity=1 
+
+material material=GaN VSATN=1.9064e7 ECN=220.8936 ANN=6.1973 
+material material=AlGaN VSATN=1.13e7 ECN=400 ANN=3
+material material=AlN VSATN=2.167e7 ECN=447.0339 ANN=8.7253
+
+material material=GaN AN1=2.52e8 AN2=2.52e8 BN1=3.41e7 BN2=3.41e7 AP1=5.37e6 AP2=5.37e6 BP1=1.96e7 BP2=1.96e7 BETAN=1 BETAP=1 
+material material=AlN AN1=2.52e8 AN2=2.52e8 BN1=3.41e7 BN2=3.41e7 AP1=5.37e6 AP2=5.37e6 BP1=1.96e7 BP2=1.96e7 BETAN=1 BETAP=1
+
+material material=GaN mun=1300 mup=10 eg300=3.4 permittivity=9.5 nc300=1.07e18 nv300=1.16e19 taun0=$lt taup0=$lt 
+material material=AlGaN affinity=3.82 mun=600 mup=10 eg300=3.96 nc300=2.07e18 nv300=1.16e19 real.index=2.5 imag.index=0.001 taun0=$lt taup0=$lt
+
+##### INTERFACE PH CHARGES ######## 
+
+#interface qf=1.2e22 x.min=1.5 x.max=2.5 y.min=0 y.max=0
+
+
+############### METHOD ################ 
+method newton trap maxtrap=20 itlimit=35
+####################################### 
+
+############### IdVd ###############
+solve init 
+solve vgate=0
+solve prev
+save outf=GAS0.str 
+log outf=GAS0_IdVd.log 
+solve name=drain vgate=0 vstep=0.5 vfinal=12
+tonyplot GAS0.str 
+tonyplot GAS0_IdVd.log
+log off
+################ 5ppm ##################
+
+go atlas
+
+set lt=1e-7 
+
+
+mesh width = 300
+
+####### X-MESHING ########
+x.mesh loc=0 spac=1
+x.mesh loc=0.5 spac=0.5
+x.mesh loc=1.5 spac=0.25
+x.mesh loc=2.5 spac=0.25
+x.mesh loc=4.5 spac=0.5
+x.mesh loc=5 spac=1
+
+####### Y-MESHING #######
+y.mesh loc=-0.08 spac=0.1
+y.mesh loc=-0.07 spac=0.1
+y.mesh loc=-0.069 spac=0.01
+y.mesh loc=-0.04 spac=0.1
+y.mesh loc=-0.02 spac=0.001
+y.mesh loc=0 spac=0.0001
+y.mesh loc=0.018 spac=0.001
+y.mesh loc=0.02 spac=0.0001
+y.mesh loc=0.03 spac=0.0001
+y.mesh loc=1.0 spac=0.5
+y.mesh loc=2.02 spac=0.1
+#y.mesh loc=2.05 spac=0.5
+y.mesh loc=3.02 spac=1 
+
+############### REGION ################# 
+region number=1 x.min=0 y.min=-0.08 material=Si3N4
+#region number=1 x.min=0 y.min=-0.081 material=Si3N4
+region number=2 x.min=0 x.max=5 y.min=0 y.max=0.018 material=AlGaN x.comp=0.23 
+region number=3 x.min=0 x.max=5 y.min=0.018 y.max=0.02 material=AlN
+region number=4 x.min=0 x.max=5 y.min=0.02 y.max=2.02 material=GaN 
+region number=5 x.min=1.5 x.max=2.5 y.min=-0.08 y.max=-0.07 user.material=GA
+region number=6 x.min=0 x.max=5 y.min=2.02 y.max=3.02 material=Sapphire  
+region number=7 x.min=1.5 x.max=2.5 y.min=-0.07 y.max=-0.069 user.material=Dipole_Layer
+
+############# ELECTRODE ########### 
+electrode name=source number=1 x.min=0 x.max=0.5 y.min=-0.08 y.max=0.03
+electrode name=drain number=2 x.min=4.5 x.max=5 y.min=-0.08 y.max=0.03
+electrode name=gate number=3 x.min=1.5 x.max=2.5 y.min=-0.069 y.max=0
+#electrode name=substrate number=4 y.min=3.02 y.max=3.02
+
+############# CONTACT ############
+
+contact name=source workfunction=4
+contact name=drain workfunction=4
+contact name=gate workfunction=5
+contact name=substrate number=4
+
+############# MODEL ###############
+models fldmob conmob print srh
+mobility albrct.n 
+#models polarization calc.strain polar.scale=0.75
+models polarization calc.strain polar.scale=1.0
+models TEN.PIEZO CALC.STRAIN TENSOR.SCALE=0 PSP.SCALE=0.75 PIEZO.SCALE=0.75
+output con.band val.band charge polar.charge band.par qss e.lines e.velocity e.mobility
+
+############# IMPACT IONIZATION PARAMETERS #############
+material material=Dipole_Layer user.default=oxide user.group=Insulator permittivity=2.25 
+material material=GA user.default=oxide user.group=Insulator permittivity=1 
+
+material material=GaN VSATN=1.9064e7 ECN=220.8936 ANN=6.1973 
+material material=AlGaN VSATN=1.13e7 ECN=400 ANN=3
+material material=AlN VSATN=2.167e7 ECN=447.0339 ANN=8.7253
+
+material material=GaN AN1=2.52e8 AN2=2.52e8 BN1=3.41e7 BN2=3.41e7 AP1=5.37e6 AP2=5.37e6 BP1=1.96e7 BP2=1.96e7 BETAN=1 BETAP=1 
+material material=AlN AN1=2.52e8 AN2=2.52e8 BN1=3.41e7 BN2=3.41e7 AP1=5.37e6 AP2=5.37e6 BP1=1.96e7 BP2=1.96e7 BETAN=1 BETAP=1
+
+material material=GaN mun=1300 mup=10 eg300=3.4 permittivity=9.5 nc300=1.07e18 nv300=1.16e19 taun0=$lt taup0=$lt 
+material material=AlGaN affinity=3.82 mun=600 mup=10 eg300=3.96 nc300=2.07e18 nv300=1.16e19 real.index=2.5 imag.index=0.001 taun0=$lt taup0=$lt
+
+##### INTERFACE PH CHARGES ######## 
+
+#interface qf=1.2e22 x.min=1.5 x.max=2.5 y.min=0 y.max=0
+
+
+############### METHOD ################ 
+method newton trap maxtrap=20 itlimit=35
+####################################### 
+
+############### IdVd ###############
+solve init 
+solve vgate=0
+solve prev
+save outf=GAS5.str 
+log outf=GAS5_IdVd.log 
+solve name=drain vgate=0 vstep=0.5 vfinal=12
+#tonyplot GAS5.str 
+#tonyplot GAS5_IdVd.log
+log off
+
+################ 10ppm ##################
+
+go atlas
+
+set lt=1e-7 
+
+
+mesh width = 300
+
+####### X-MESHING ########
+x.mesh loc=0 spac=1
+x.mesh loc=0.5 spac=0.5
+x.mesh loc=1.5 spac=0.25
+x.mesh loc=2.5 spac=0.25
+x.mesh loc=4.5 spac=0.5
+x.mesh loc=5 spac=1
+
+####### Y-MESHING #######
+y.mesh loc=-0.08 spac=0.1
+y.mesh loc=-0.07 spac=0.1
+y.mesh loc=-0.069 spac=0.01
+y.mesh loc=-0.04 spac=0.1
+y.mesh loc=-0.02 spac=0.001
+y.mesh loc=0 spac=0.0001
+y.mesh loc=0.018 spac=0.001
+y.mesh loc=0.02 spac=0.0001
+y.mesh loc=0.03 spac=0.0001
+y.mesh loc=1.0 spac=0.5
+y.mesh loc=2.02 spac=0.1
+#y.mesh loc=2.05 spac=0.5
+y.mesh loc=3.02 spac=1 
+
+############### REGION ################# 
+region number=1 x.min=0 y.min=-0.08 material=Si3N4
+#region number=1 x.min=0 y.min=-0.081 material=Si3N4
+region number=2 x.min=0 x.max=5 y.min=0 y.max=0.018 material=AlGaN x.comp=0.23 
+region number=3 x.min=0 x.max=5 y.min=0.018 y.max=0.02 material=AlN
+region number=4 x.min=0 x.max=5 y.min=0.02 y.max=2.02 material=GaN 
+region number=5 x.min=1.5 x.max=2.5 y.min=-0.08 y.max=-0.07 user.material=GA
+region number=6 x.min=0 x.max=5 y.min=2.02 y.max=3.02 material=Sapphire  
+region number=7 x.min=1.5 x.max=2.5 y.min=-0.07 y.max=-0.069 user.material=Dipole_Layer
+
+############# ELECTRODE ########### 
+electrode name=source number=1 x.min=0 x.max=0.5 y.min=-0.08 y.max=0.03
+electrode name=drain number=2 x.min=4.5 x.max=5 y.min=-0.08 y.max=0.03
+electrode name=gate number=3 x.min=1.5 x.max=2.5 y.min=-0.069 y.max=0
+#electrode name=substrate number=4 y.min=3.02 y.max=3.02
+
+############# CONTACT ############
+
+contact name=source workfunction=4
+contact name=drain workfunction=4
+contact name=gate workfunction=4.8
+contact name=substrate number=4
+
+############# MODEL ###############
+models fldmob conmob print srh
+mobility albrct.n 
+#models polarization calc.strain polar.scale=0.75
+models polarization calc.strain polar.scale=1.0
+models TEN.PIEZO CALC.STRAIN TENSOR.SCALE=0 PSP.SCALE=0.75 PIEZO.SCALE=0.75
+output con.band val.band charge polar.charge band.par qss e.lines e.velocity e.mobility
+
+############# IMPACT IONIZATION PARAMETERS #############
+material material=Dipole_Layer user.default=oxide user.group=Insulator permittivity=2.25 
+material material=GA user.default=oxide user.group=Insulator permittivity=1 
+
+material material=GaN VSATN=1.9064e7 ECN=220.8936 ANN=6.1973 
+material material=AlGaN VSATN=1.13e7 ECN=400 ANN=3
+material material=AlN VSATN=2.167e7 ECN=447.0339 ANN=8.7253
+
+material material=GaN AN1=2.52e8 AN2=2.52e8 BN1=3.41e7 BN2=3.41e7 AP1=5.37e6 AP2=5.37e6 BP1=1.96e7 BP2=1.96e7 BETAN=1 BETAP=1 
+material material=AlN AN1=2.52e8 AN2=2.52e8 BN1=3.41e7 BN2=3.41e7 AP1=5.37e6 AP2=5.37e6 BP1=1.96e7 BP2=1.96e7 BETAN=1 BETAP=1
+
+material material=GaN mun=1300 mup=10 eg300=3.4 permittivity=9.5 nc300=1.07e18 nv300=1.16e19 taun0=$lt taup0=$lt 
+material material=AlGaN affinity=3.82 mun=600 mup=10 eg300=3.96 nc300=2.07e18 nv300=1.16e19 real.index=2.5 imag.index=0.001 taun0=$lt taup0=$lt
+
+##### INTERFACE PH CHARGES ######## 
+
+#interface qf=1.2e22 x.min=1.5 x.max=2.5 y.min=0 y.max=0
+
+
+############### METHOD ################ 
+method newton trap maxtrap=20 itlimit=35
+####################################### 
+
+############### IdVd ###############
+solve init 
+solve vgate=0
+solve prev
+save outf=GAS10.str 
+log outf=GAS10_IdVd.log 
+solve name=drain vgate=0 vstep=0.5 vfinal=12
+#tonyplot GAS5.str 
+#tonyplot GAS5_IdVd.log
+log off
+################ 15ppm ##################
+
+go atlas
+
+set lt=1e-7 
+
+
+mesh width = 300
+
+####### X-MESHING ########
+x.mesh loc=0 spac=1
+x.mesh loc=0.5 spac=0.5
+x.mesh loc=1.5 spac=0.25
+x.mesh loc=2.5 spac=0.25
+x.mesh loc=4.5 spac=0.5
+x.mesh loc=5 spac=1
+
+####### Y-MESHING #######
+y.mesh loc=-0.08 spac=0.1
+y.mesh loc=-0.07 spac=0.1
+y.mesh loc=-0.069 spac=0.01
+y.mesh loc=-0.04 spac=0.1
+y.mesh loc=-0.02 spac=0.001
+y.mesh loc=0 spac=0.0001
+y.mesh loc=0.018 spac=0.001
+y.mesh loc=0.02 spac=0.0001
+y.mesh loc=0.03 spac=0.0001
+y.mesh loc=1.0 spac=0.5
+y.mesh loc=2.02 spac=0.1
+#y.mesh loc=2.05 spac=0.5
+y.mesh loc=3.02 spac=1 
+
+############### REGION ################# 
+region number=1 x.min=0 y.min=-0.08 material=Si3N4
+#region number=1 x.min=0 y.min=-0.081 material=Si3N4
+region number=2 x.min=0 x.max=5 y.min=0 y.max=0.018 material=AlGaN x.comp=0.23 
+region number=3 x.min=0 x.max=5 y.min=0.018 y.max=0.02 material=AlN
+region number=4 x.min=0 x.max=5 y.min=0.02 y.max=2.02 material=GaN 
+region number=5 x.min=1.5 x.max=2.5 y.min=-0.08 y.max=-0.07 user.material=GA
+region number=6 x.min=0 x.max=5 y.min=2.02 y.max=3.02 material=Sapphire  
+region number=7 x.min=1.5 x.max=2.5 y.min=-0.07 y.max=-0.069 user.material=Dipole_Layer
+
+############# ELECTRODE ########### 
+electrode name=source number=1 x.min=0 x.max=0.5 y.min=-0.08 y.max=0.03
+electrode name=drain number=2 x.min=4.5 x.max=5 y.min=-0.08 y.max=0.03
+electrode name=gate number=3 x.min=1.5 x.max=2.5 y.min=-0.069 y.max=0
+#electrode name=substrate number=4 y.min=3.02 y.max=3.02
+
+############# CONTACT ############
+
+contact name=source workfunction=4
+contact name=drain workfunction=4
+contact name=gate workfunction=4.6
+contact name=substrate number=4
+
+############# MODEL ###############
+models fldmob conmob print srh
+mobility albrct.n 
+#models polarization calc.strain polar.scale=0.75
+models polarization calc.strain polar.scale=1.0
+models TEN.PIEZO CALC.STRAIN TENSOR.SCALE=0 PSP.SCALE=0.75 PIEZO.SCALE=0.75
+output con.band val.band charge polar.charge band.par qss e.lines e.velocity e.mobility
+
+############# IMPACT IONIZATION PARAMETERS #############
+material material=Dipole_Layer user.default=oxide user.group=Insulator permittivity=2.25 
+material material=GA user.default=oxide user.group=Insulator permittivity=1 
+
+material material=GaN VSATN=1.9064e7 ECN=220.8936 ANN=6.1973 
+material material=AlGaN VSATN=1.13e7 ECN=400 ANN=3
+material material=AlN VSATN=2.167e7 ECN=447.0339 ANN=8.7253
+
+material material=GaN AN1=2.52e8 AN2=2.52e8 BN1=3.41e7 BN2=3.41e7 AP1=5.37e6 AP2=5.37e6 BP1=1.96e7 BP2=1.96e7 BETAN=1 BETAP=1 
+material material=AlN AN1=2.52e8 AN2=2.52e8 BN1=3.41e7 BN2=3.41e7 AP1=5.37e6 AP2=5.37e6 BP1=1.96e7 BP2=1.96e7 BETAN=1 BETAP=1
+
+material material=GaN mun=1300 mup=10 eg300=3.4 permittivity=9.5 nc300=1.07e18 nv300=1.16e19 taun0=$lt taup0=$lt 
+material material=AlGaN affinity=3.82 mun=600 mup=10 eg300=3.96 nc300=2.07e18 nv300=1.16e19 real.index=2.5 imag.index=0.001 taun0=$lt taup0=$lt
+
+##### INTERFACE PH CHARGES ######## 
+
+#interface qf=1.2e22 x.min=1.5 x.max=2.5 y.min=0 y.max=0
+
+
+############### METHOD ################ 
+method newton trap maxtrap=20 itlimit=35
+####################################### 
+
+############### IdVd ###############
+solve init 
+solve vgate=0
+solve prev
+save outf=GAS15.str 
+log outf=GAS15_IdVd.log 
+solve name=drain vgate=0 vstep=0.5 vfinal=12
+#tonyplot GAS5.str 
+#tonyplot GAS5_IdVd.log
+log off
+################ 20ppm ##################
+
+go atlas
+
+set lt=1e-7 
+
+
+mesh width = 300
+
+####### X-MESHING ########
+x.mesh loc=0 spac=1
+x.mesh loc=0.5 spac=0.5
+x.mesh loc=1.5 spac=0.25
+x.mesh loc=2.5 spac=0.25
+x.mesh loc=4.5 spac=0.5
+x.mesh loc=5 spac=1
+
+####### Y-MESHING #######
+y.mesh loc=-0.08 spac=0.1
+y.mesh loc=-0.07 spac=0.1
+y.mesh loc=-0.069 spac=0.01
+y.mesh loc=-0.04 spac=0.1
+y.mesh loc=-0.02 spac=0.001
+y.mesh loc=0 spac=0.0001
+y.mesh loc=0.018 spac=0.001
+y.mesh loc=0.02 spac=0.0001
+y.mesh loc=0.03 spac=0.0001
+y.mesh loc=1.0 spac=0.5
+y.mesh loc=2.02 spac=0.1
+#y.mesh loc=2.05 spac=0.5
+y.mesh loc=3.02 spac=1 
+
+############### REGION ################# 
+region number=1 x.min=0 y.min=-0.08 material=Si3N4
+#region number=1 x.min=0 y.min=-0.081 material=Si3N4
+region number=2 x.min=0 x.max=5 y.min=0 y.max=0.018 material=AlGaN x.comp=0.23 
+region number=3 x.min=0 x.max=5 y.min=0.018 y.max=0.02 material=AlN
+region number=4 x.min=0 x.max=5 y.min=0.02 y.max=2.02 material=GaN 
+region number=5 x.min=1.5 x.max=2.5 y.min=-0.08 y.max=-0.07 user.material=GA
+region number=6 x.min=0 x.max=5 y.min=2.02 y.max=3.02 material=Sapphire  
+region number=7 x.min=1.5 x.max=2.5 y.min=-0.07 y.max=-0.069 user.material=Dipole_Layer
+
+############# ELECTRODE ########### 
+electrode name=source number=1 x.min=0 x.max=0.5 y.min=-0.08 y.max=0.03
+electrode name=drain number=2 x.min=4.5 x.max=5 y.min=-0.08 y.max=0.03
+electrode name=gate number=3 x.min=1.5 x.max=2.5 y.min=-0.069 y.max=0
+#electrode name=substrate number=4 y.min=3.02 y.max=3.02
+
+############# CONTACT ############
+
+contact name=source workfunction=4
+contact name=drain workfunction=4
+contact name=gate workfunction=4.4
+contact name=substrate number=4
+
+############# MODEL ###############
+models fldmob conmob print srh
+mobility albrct.n 
+#models polarization calc.strain polar.scale=0.75
+models polarization calc.strain polar.scale=1.0
+models TEN.PIEZO CALC.STRAIN TENSOR.SCALE=0 PSP.SCALE=0.75 PIEZO.SCALE=0.75
+output con.band val.band charge polar.charge band.par qss e.lines e.velocity e.mobility
+
+############# IMPACT IONIZATION PARAMETERS #############
+material material=Dipole_Layer user.default=oxide user.group=Insulator permittivity=2.25 
+material material=GA user.default=oxide user.group=Insulator permittivity=1 
+
+material material=GaN VSATN=1.9064e7 ECN=220.8936 ANN=6.1973 
+material material=AlGaN VSATN=1.13e7 ECN=400 ANN=3
+material material=AlN VSATN=2.167e7 ECN=447.0339 ANN=8.7253
+
+material material=GaN AN1=2.52e8 AN2=2.52e8 BN1=3.41e7 BN2=3.41e7 AP1=5.37e6 AP2=5.37e6 BP1=1.96e7 BP2=1.96e7 BETAN=1 BETAP=1 
+material material=AlN AN1=2.52e8 AN2=2.52e8 BN1=3.41e7 BN2=3.41e7 AP1=5.37e6 AP2=5.37e6 BP1=1.96e7 BP2=1.96e7 BETAN=1 BETAP=1
+
+material material=GaN mun=1300 mup=10 eg300=3.4 permittivity=9.5 nc300=1.07e18 nv300=1.16e19 taun0=$lt taup0=$lt 
+material material=AlGaN affinity=3.82 mun=600 mup=10 eg300=3.96 nc300=2.07e18 nv300=1.16e19 real.index=2.5 imag.index=0.001 taun0=$lt taup0=$lt
+
+##### INTERFACE PH CHARGES ######## 
+
+#interface qf=1.2e22 x.min=1.5 x.max=2.5 y.min=0 y.max=0
+
+
+############### METHOD ################ 
+method newton trap maxtrap=20 itlimit=35
+####################################### 
+
+############### IdVd ###############
+solve init 
+solve vgate=0
+solve prev
+save outf=GAS20.str 
+log outf=GAS20_IdVd.log 
+solve name=drain vgate=0 vstep=0.5 vfinal=12
+#tonyplot GAS5.str 
+#tonyplot GAS5_IdVd.log
+log off
+tonyplot -overlay GAS0.str GAS5.str GAS10.str GAS15.str GAS20.str -set GAS0.set
+tonyplot -overlay GAS0_IdVd.log GAS5_IdVd.log GAS10_IdVd.log GAS15_IdVd.log GAS20_IdVd.log -set GAS0_IdVd.set
+log off
+quit
+
